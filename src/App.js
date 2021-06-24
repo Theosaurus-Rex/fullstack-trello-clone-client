@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-// import './App.css';
-import { Button, Typography, Box, Card, TextField, CardContent } from '@material-ui/core';
+import './App.css';
+import { Button, Typography, Box, Card, TextField, CardContent, Grid } from '@material-ui/core';
 import { api } from './data'
 import { validateInput } from './utils/validators';
 
@@ -55,34 +55,38 @@ function App() {
   
 
   return (
-    <Box>
-      
-        <Typography>
+    <div class="body">
+    <Grid  container direction="column" justify="center" alignItems="center">
+        <Typography class="title">
           Trello Clone
         </Typography>
 
-        <Button>
-          This is a Button
-        </Button>
-
+      <Grid container direction="row" justify="center" alignItems="center">
         {cards.map(({title, description, id}) => (
-          <Box key={id}>
+          <Box class="card" key={id}>
             <Card variant="outlined" color="primary">
               <CardContent>
-                <Typography>{title}</Typography>
-                <Typography>{description}</Typography>
+                <Typography variant="h4">{title}</Typography>
+                <Typography variant="h5">{description}</Typography>
               </CardContent>
             </Card>
           </Box>
         ))}
+      </Grid>
+    
 
         {/* NEW CARD FORM */}
+      
         <form onSubmit={addCard}>
-          <TextField onChange={(event) => handleTextChange(event, setTitle)} value={title} id="title" label="Title"/>
-          <TextField onChange={(event) => handleTextChange(event, setDescription)} value={description} id="description" label="Description"/>
-          <Button type="submit">Add Task</Button>
+          <Grid container direction="column" justify="center" alignItems="center">
+            <TextField onChange={(event) => handleTextChange(event, setTitle)} value={title} id="title" label="Title"/>
+            <TextField onChange={(event) => handleTextChange(event, setDescription)} value={description} id="description" label="Description"/>
+            <Button type="submit">Add Task</Button>
+          </Grid>
         </form>
-    </Box>
+      
+    </Grid>
+    </div>
   )
 }
 
