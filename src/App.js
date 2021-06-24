@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 // import './App.css';
 import { Button, Typography, Box, Card, TextField, CardContent } from '@material-ui/core';
 import { api } from './data'
+import { validateInput } from './utils/validators';
 
 
 function App() {
@@ -16,7 +17,14 @@ function App() {
   }, [])
 
   const handleTextChange = (event, setter) => {
-    setter(event.target.value)
+    // Run input through the validator function
+    const textInput = event.target.value
+    if (validateInput(textInput)) {
+      setter(textInput)
+    } else {
+      alert("That is a naughty word!")
+    }
+    
   }
 
   const addCard = (event) => {
@@ -59,7 +67,7 @@ function App() {
 
         {cards.map(({title, description, id}) => (
           <Box key={id}>
-            <Card variant="outlined">
+            <Card variant="outlined" color="primary">
               <CardContent>
                 <Typography>{title}</Typography>
                 <Typography>{description}</Typography>
