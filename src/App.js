@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Button, Typography, Box, Card, TextField, CardContent, Grid, CircularProgress, FormHelperText } from '@material-ui/core';
+import { Button, Typography, Box, Card, TextField, CardContent, Grid, CircularProgress, FormHelperText, IconButton } from '@material-ui/core';
 import { api } from './data'
 import { validateInput } from './utils/validators';
 import { Alert } from '@material-ui/lab'
+import { Delete } from '@material-ui/icons'
 
 
 function App() {
@@ -59,6 +60,26 @@ function App() {
       .finally(setLoading(false))
   }
 
+
+  const deleteCard = async (id, index) => {
+    // Set loading state
+    setLoading(true)
+
+    try {
+      let response = await api.delete(`/cards/${id}`, { id })
+      // Remove card from react state
+      const cardsCopy = [...cards]
+      cardsCopy.splice(index, 1)
+      setCards(cardsCopy)
+    } catch({message}) {
+      setErrorMessage(message)
+    } finally {
+      setLoading(false)
+    }
+    // Send HTTP Delete request to delete path on backend
+    // Pass in id of card to delete
+    // Unset loading state
+  }
   
 
   return (
@@ -72,12 +93,13 @@ function App() {
         {loading && <CircularProgress/>}
 
       <Grid container direction="row" justify="center" alignItems="center">
-        {cards.map(({title, description, id}) => (
+        {cards.map(({title, description, id}, index) => (
           <Box className="card" key={id}>
             <Card variant="outlined" color="primary">
               <CardContent>
                 <Typography variant="h4">{title}</Typography>
                 <Typography variant="h5">{description}</Typography>
+                <IconButton onClick={(e) => deleteCard(id, index)}><Delete></Delete></IconButton>
               </CardContent>
             </Card>
           </Box>
