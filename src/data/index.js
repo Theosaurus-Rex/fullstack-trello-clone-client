@@ -1,6 +1,13 @@
 import axios from 'axios'
 
-const apiUrl = process.env.REACT_APP_API_URL
+let apiUrl
+
+
+if (process.env.NODE_ENV === "production") {
+    apiUrl = "https://mighty-river-42782.herokuapp.com/"
+} else {
+    apiUrl = process.env.REACT_APP_API_URL
+}
 
 export const api = axios.create({
     baseURL: apiUrl
