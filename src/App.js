@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import { Button, Typography, Box, Card, TextField, CardContent, Grid } from '@material-ui/core';
+import { Button, Typography, Box, Card, TextField, CardContent, Grid, CircularProgress, FormHelperText } from '@material-ui/core';
 import { api } from './data'
 import { validateInput } from './utils/validators';
+import { Alert } from '@material-ui/lab'
 
 
 function App() {
@@ -10,25 +11,30 @@ function App() {
   const [cards, setCards] = useState([])
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [titleValid, setTitleValid] = useState(true)
+  const [descriptionValid, setDescriptionValid] = useState(true)
 
   useEffect(() => {
     api.get("/cards")
       .then(({data}) => setCards(data))
+      .catch((err) => setErrorMessage(err.message))
+      .finally(setLoading(false))
   }, [])
 
-  const handleTextChange = (event, setter) => {
-    // Run input through the validator function
-    const textInput = event.target.value
-    if (validateInput(textInput)) {
-      setter(textInput)
-    } else {
-      alert("That is a naughty word!")
-    }
-    
-  }
+  useEffect(() => {
+    setTitleValid(validateInput(title))
+  }, [title])
+
+  useEffect(() => {
+    setDescriptionValid(validateInput(description))
+  }, [description])
+
 
   const addCard = (event) => {
     event.preventDefault()
+    setLoading(true)
     
     // Send post request to add new card to backend
     api.post("/cards", {
@@ -49,21 +55,25 @@ function App() {
         //Set it as new state
         setCards(cardsClone)
       })
-      .catch(err => console.log("oops: ", err))
+      .catch((err) => setErrorMessage(err.message))
+      .finally(setLoading(false))
   }
 
   
 
   return (
-    <div class="body">
+    <div className="body">
     <Grid  container direction="column" justify="center" alignItems="center">
-        <Typography class="title">
+        <Typography component="h1" variant="h2">
           Trello Clone
         </Typography>
 
+        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+        {loading && <CircularProgress/>}
+
       <Grid container direction="row" justify="center" alignItems="center">
         {cards.map(({title, description, id}) => (
-          <Box class="card" key={id}>
+          <Box className="card" key={id}>
             <Card variant="outlined" color="primary">
               <CardContent>
                 <Typography variant="h4">{title}</Typography>
@@ -79,9 +89,10 @@ function App() {
       
         <form onSubmit={addCard}>
           <Grid container direction="column" justify="center" alignItems="center">
-            <TextField onChange={(event) => handleTextChange(event, setTitle)} value={title} id="title" label="Title"/>
-            <TextField onChange={(event) => handleTextChange(event, setDescription)} value={description} id="description" label="Description"/>
-            <Button type="submit">Add Task</Button>
+            <TextField error={!titleValid} onChange={(event) => setTitle(event.target.value)} value={title} id="title" label="Title"/>
+            <TextField error={!descriptionValid} onChange={(event) => setDescription(event.target.value)} value={description} id="description" label="Description"/>
+            <Button disabled={!titleValid || !descriptionValid} type="submit">Add Task</Button>
+            <FormHelperText error={!titleValid || !descriptionValid}>Please don't use any naughty words.</FormHelperText>
           </Grid>
         </form>
       
