@@ -57,7 +57,7 @@ function App() {
         setCards(cardsClone)
       })
       .catch((err) => setErrorMessage(err.message))
-      .finally(setLoading(false))
+      .finally(() => setLoading(false))
   }
 
 
